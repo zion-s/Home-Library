@@ -1,10 +1,8 @@
 let myLibrary = [];
 
-showLibrary();
-
 function Book(title, author, pages, read) {
-    this.titleName = title;
-    this.authorName = author;
+    this.title = title;
+    this.author = author;
     this.pages = pages;
     if(read==='true'){
         this.read = true
@@ -13,19 +11,17 @@ function Book(title, author, pages, read) {
     }
   }
 
-  render();
+  const updateStorage = ()=>{
+    localStorage.setItem('books', JSON.stringify(myLibrary));
+}
 
-  const addBookToLibrary = (title, author, pages, read) {
+  const addBookToLibrary = (title, author, pages, read) =>{
       let newBook = new Book(title, author, pages, read);
       myLibrary.push(newBook);
-      updateLibrary();
+      updateStorage();
   }
 
-  const updateLibrary = ()=>{
-      localStorage.setItem('books', JSON.stringify(myLibrary));
-  }
-
-  const showLibrary = ()=>{
+  const loadStorage = ()=>{
       if(localStorage.getItem('books')){
           myLibrary = JSON.parse(localStorage.getItem('books'));
     
@@ -41,12 +37,14 @@ function Book(title, author, pages, read) {
   }  
 }
 
+loadStorage();
+
   const render = ()=>{
       const row = document.querySelector(".row");
       row.innerHTML = '';
         myLibrary.forEach((book)=>{
             const outerCard = document.createElement("div");
-            outerCard.classList.add("col-lg-3, col-sm-6, mb-5");
+            outerCard.classList.add("col-lg-3", "col-sm-6", "mb-5");
 
             const innerCard = document.createElement("div");
             innerCard.classList.add("card");
@@ -58,7 +56,7 @@ function Book(title, author, pages, read) {
 
             const title = document.createElement("h5");
             title.classList.add("card-title");
-            title.textContent = book.title;
+            title.textContent = `${book.title}`;
             cardBody.appendChild(title);
 
             const author = document.createElement("h6");
@@ -71,9 +69,33 @@ function Book(title, author, pages, read) {
             pages.textContent = `Pages: ${book.pages}`;
             cardBody.appendChild(pages);
 
+            const remove = document.createElement("button");
+            remove.classList.add("btn", "btn-sm", "btn-danger");
+            remove.textContent = "Remove";
+            cardBody.appendChild(remove);
+
             outerCard.setAttribute('id', myLibrary.indexOf(book));
 
             row.appendChild(outerCard);
 
         })
   }
+
+  render();
+
+const formFields = document.getElementsByName("BookForm")[0];
+const closeForm = document.querySelector("#closeForm");
+closeForm.addEventListener("click", ()=>{
+    formFields.reset();
+})
+
+  const addBook = document.querySelector("#addBook");
+addBook.addEventListener("click", ()=>{
+    let bookTitle = document.forms["BookForm"]["title"];
+    let bookAuthor = document.forms["BookForm"]["author"];
+    let bookPages = document.forms["BookForm"]["pages"];
+    let bookRead = document.forms["BookForm"]["read"];
+    addBookToLibrary(bookTitle.value, bookAuthor.value, bookPages.value, bookRead.value);
+    render();
+    formFields.reset();
+})
