@@ -4,7 +4,7 @@ function Book(title, author, pages, read) {
     this.title = title;
     this.author = author;
     this.pages = pages;
-    if(read==='true'){
+    if(read===true){
         this.read = true
     } else {
         this.read = false
@@ -29,11 +29,8 @@ function Book(title, author, pages, read) {
           myLibrary[i] = new Book(myLibrary[i].title, myLibrary[i].author, myLibrary[i].pages, myLibrary[i].read)
       }
   } else {
-    addBookToLibrary("The Fellowship of the Ring", "J.R.R. Tolkien", 423, true);
-    addBookToLibrary("Flowers for Algernon", "Daniel Keyes", 311, true);
-    addBookToLibrary("Alice in Wonderland", "Lewis Carroll", 200, true);
-    addBookToLibrary("1984", "George Orwell", 328, false);
-    addBookToLibrary("Slaughterhouse-Five", "Kurt Vonnegut", 215, true);
+    addBookToLibrary("To Kill A Mockingbird", "Harper Lee", 281, true);
+    addBookToLibrary("Magicians Of The Gods", "Graham Hancock", 448, false);
   }  
 }
 
@@ -47,7 +44,7 @@ loadStorage();
             outerCard.classList.add("col-lg-3", "col-sm-6", "mb-5");
 
             const innerCard = document.createElement("div");
-            innerCard.classList.add("card");
+            innerCard.classList.add("card", "bg-light");
             outerCard.appendChild(innerCard); 
             
             const cardBody = document.createElement("div");
@@ -69,10 +66,35 @@ loadStorage();
             pages.textContent = `Pages: ${book.pages}`;
             cardBody.appendChild(pages);
 
+            const readButton = document.createElement("button");
+            readButton.classList.add("btn", "btn-sm");
+            if(book.read){
+              readButton.classList.add("btn-success");
+              readButton.innerHTML='I have read this book!';
+            }
+            else {
+              readButton.classList.add("btn-link");
+              readButton.innerHTML='I have not read this book!';
+            }
+            cardBody.appendChild(readButton);
+            readButton.addEventListener("click", ()=>{
+              let bookId = myLibrary.indexOf(book);
+              myLibrary[bookId].read = !myLibrary[bookId].read;
+              render();
+              updateStorage();
+              countBooks();
+            })
+
             const remove = document.createElement("button");
             remove.classList.add("btn", "btn-sm", "btn-danger");
-            remove.textContent = "Remove";
+            remove.innerHTML = '<i class="fas fa-trash"></i>Remove';
             cardBody.appendChild(remove);
+            remove.addEventListener("click", ()=>{
+              let bookId = myLibrary.indexOf(book);
+              myLibrary.splice(bookId, 1);
+              render();
+              updateStorage();
+            })
 
             outerCard.setAttribute('id', myLibrary.indexOf(book));
 
@@ -99,3 +121,19 @@ addBook.addEventListener("click", ()=>{
     render();
     formFields.reset();
 })
+
+const totalBooks = document.getElementById("totalBooks");
+totalBooks.innerHTML = myLibrary.length;
+
+let completedBooks = document.getElementById("completedBooks");
+const countBooks = ()=>{
+  let count = 0;
+  for(let i=0;i<myLibrary.length;i++){
+    if(myLibrary[i].read == true){
+      count+=1;
+    }
+  }
+  completedBooks.innerHTML = count;
+} 
+
+countBooks();
